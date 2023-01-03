@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="be">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel='stylesheet' />
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .legend_icon {
+            width: 30px;
+            height: 30px;
+            vertical-align: middle;
+        }
+        </style>
+        <title>Велаінфраструктура Гомеля</title>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/bicycle_cycleway.geojson"></script>
+        <script src="data/bicycle_parking.geojson"></script>
+        <script src="data/bicycle_repair_station.geojson"></script>
+        <script src="data/bicycle_shop.geojson"></script>
+        <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+        <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.17/leaflet-maplibre-gl.js"></script>
+        <script>
+
+        const ICON_PARKING = 'markers/bike-parking-m.svg';
+        const ICON_SHOP = 'markers/shop-bicycle-m.svg';
+        const ICON_REPAIR_STATION = 'markers/bicycle-repair-station.svg';
+
+        var map = L.map('map', {
+            zoomControl:true, 
+            center: [52.42402, 31.01419],
+            zoom: 17,
+            maxZoom:28, 
+            minZoom:1
+        });
+        var hash = new L.Hash(map);
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+
+        L.Control.textbox = L.Control.extend({
+            onAdd: function(map) {
+                var text = L.DomUtil.create('div');
+                text.className = "leaflet-control-attribution";
+                text.innerHTML = "Версія: 0.1.0 | Данныя ад 2022-12-05 10:46:47+00";
+                return text;
+            },
+            onRemove: function(map) {
+            }
+        });
+        L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+        L.control.textbox({ position: 'bottomleft' }).addTo(map);
+
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_tiles_0');
+        map.getPane('pane_tiles_0').style.zIndex = 400;
+        var layer_map_0 = L.maplibreGL({
+            style: 'https://api.maptiler.com/maps/2c580f09-60c7-4605-91c1-df1f95237b63/style.json?key=ASg4VgRRA6g15DrSqB68',
+            pane: 'pane_tiles_0',
+            opacity: 1.0,
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20,
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> <a href="https://github.com/tomchadwin/qgis2web" target="_blank">&copy; qgis2web</a> <a href="https://qgis.org" target="_blank">&copy; QGIS</a>'
+        });
+        layer_map_0;
+        map.addLayer(layer_map_0);
+
+        function pop_cycleway_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Паверхня</th>\
+                        <td>' + (feature.properties['surface'] !== null ? autolinker.link(feature.properties['surface'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Стан</th>\
+                        <td>' + (feature.properties['smoothness'] !== null ? autolinker.link(feature.properties['smoothness'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Раздзельная</th>\
+                        <td>' + (feature.properties['segregated'] !== null ? autolinker.link(feature.properties['segregated'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Даўжыня, м</th>\
+                        <td>' + (feature.properties['length'] !== null ? autolinker.link(feature.properties['length'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+        function style_cycleway_1() {
+            return {
+                pane: 'pane_cycleway_1',
+                opacity: 1,
+                color: 'rgba(255,22,84,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.5,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_cycleway_1');
+        map.getPane('pane_cycleway_1').style.zIndex = 401;
+        map.getPane('pane_cycleway_1').style['mix-blend-mode'] = 'normal';
+        
+        var layer_cycleway_1 = new L.geoJson(json_cycleway, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_cycleway',
+            layerName: 'layer_cycleway_1',
+            pane: 'pane_cycleway_1',
+            onEachFeature: pop_cycleway_1,
+            style: style_cycleway_1,
+        });
+        bounds_group.addLayer(layer_cycleway_1);
+        map.addLayer(layer_cycleway_1);
+        function onZoomendCycleway(feature, layer) {
+            var currentZoom = map.getZoom();
+              if (currentZoom >= 18) {
+                layer_cycleway_1.eachLayer(function(layer) {
+                    layer.setStyle({weight: 3});
+                });
+              } else if (currentZoom >= 16 && currentZoom < 18 ){
+                layer_cycleway_1.eachLayer(function(layer) {
+                    layer.setStyle({weight: 1.5});
+                });
+              } else {
+                layer_cycleway_1.eachLayer(function(layer) {
+                    layer.setStyle({weight: 1});
+                });
+              }
+        };
+        map.on('zoomend', onZoomendCycleway);
+
+
+        function pop_parking_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Тып</th>\
+                        <td>' + (feature.properties['type'] !== null ? autolinker.link(feature.properties['type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Умяшчальнасць</th>\
+                        <td>' + (feature.properties['capacity'] !== null ? autolinker.link(feature.properties['capacity'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Доступ</th>\
+                        <td>' + (feature.properties['access'] !== null ? autolinker.link(feature.properties['access'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Плата</th>\
+                        <td>' + (feature.properties['fee'] !== null ? autolinker.link(feature.properties['fee'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Дах</th>\
+                        <td>' + (feature.properties['covered'] !== null ? autolinker.link(feature.properties['covered'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+        function style_parking_2() {
+            return {
+                pane: 'pane_parking_2',
+                rotationAngle: 0.0,
+                rotationOrigin: 'center center',
+                icon: setIconSize(ICON_PARKING, 1),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_parking_2');
+        map.getPane('pane_parking_2').style.zIndex = 402;
+        map.getPane('pane_parking_2').style['mix-blend-mode'] = 'normal';
+        var layer_parking_2 = new L.geoJson(json_parking, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_parking',
+            layerName: 'layer_parking_2',
+            pane: 'pane_parking_2',
+            onEachFeature: pop_parking_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_parking_2(feature));
+            },
+        });
+        bounds_group.addLayer(layer_parking_2);
+        map.addLayer(layer_parking_2);
+        function onZoomendParking(feature, layer) {
+            var currentZoom = map.getZoom();
+              if (currentZoom >= 18) {
+                layer_parking_2.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_PARKING, 1.3));
+                });
+              } else if (currentZoom >= 16 && currentZoom < 18 ){
+                layer_parking_2.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_PARKING, 1));
+                });
+              } else {
+                layer_parking_2.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_PARKING, 0.2));
+                });
+              }
+        };
+        map.on('zoomend', onZoomendParking);
+
+
+        function pop_shop_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Назва</th>\
+                        <td>' + (feature.properties['name_be'] !== null ? autolinker.link(feature.properties['name_be'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Продаж</th>\
+                        <td>' + (feature.properties['retail'] !== null ? autolinker.link(feature.properties['retail'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Рамонт</th>\
+                        <td>' + (feature.properties['repair'] !== null ? autolinker.link(feature.properties['repair'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Пракат</th>\
+                        <td>' + (feature.properties['rental'] !== null ? autolinker.link(feature.properties['rental'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Час працы</th>\
+                        <td>' + (feature.properties['opening_hours'] !== null ? autolinker.link(feature.properties['opening_hours'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Адрас</th>\
+                        <td>' + (feature.properties['addr_street'] !== null ? autolinker.link(feature.properties['addr_street'].toLocaleString()) : '') + ', ' + (feature.properties['addr_housenumber'] !== null ? autolinker.link(feature.properties['addr_housenumber'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Сайт</th>\
+                        <td>' + (feature.properties['website'] !== null ? autolinker.link(feature.properties['website'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+        function style_shop_3() {
+            return {
+                pane: 'pane_shop_3',
+                rotationAngle: 0.0,
+                rotationOrigin: 'center center',
+                icon: setIconSize(ICON_SHOP, 1.1),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_shop_3');
+        map.getPane('pane_shop_3').style.zIndex = 403;
+        map.getPane('pane_shop_3').style['mix-blend-mode'] = 'normal';
+        var layer_shop_3 = new L.geoJson(json_shop, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_shop',
+            layerName: 'layer_shop_3',
+            pane: 'pane_shop_3',
+            onEachFeature: pop_shop_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_shop_3(feature));
+            },
+        });
+        bounds_group.addLayer(layer_shop_3);
+        map.addLayer(layer_shop_3);
+        function onZoomendShop(feature, layer) {
+            var currentZoom = map.getZoom();
+            if (currentZoom >= 18) {
+                layer_shop_3.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_SHOP, 1.5));
+                });
+            } else if (currentZoom >= 16 && currentZoom < 18 ){
+                layer_shop_3.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_SHOP, 1.1));
+                });
+            }
+        };
+        map.on('zoomend', onZoomendShop);
+
+        function pop_repair_station_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Час працы</th>\
+                        <td>' + (feature.properties['opening_hours'] !== null ? autolinker.link(feature.properties['opening_hours'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Плата</th>\
+                        <td>' + (feature.properties['fee'] !== null ? autolinker.link(feature.properties['fee'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Помпа</th>\
+                        <td>' + (feature.properties['pump'] !== null ? autolinker.link(feature.properties['pump'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Стойка</th>\
+                        <td>' + (feature.properties['stand'] !== null ? autolinker.link(feature.properties['stand'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Інструменты</th>\
+                        <td>' + (feature.properties['tools'] !== null ? autolinker.link(feature.properties['tools'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Дах</th>\
+                        <td>' + (feature.properties['covered'] !== null ? autolinker.link(feature.properties['covered'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Аператар</th>\
+                        <td>' + (feature.properties['operator'] !== null ? autolinker.link(feature.properties['operator'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_repair_station_4() {
+            return {
+                pane: 'pane_repair_station_4',
+                rotationAngle: 0.0,
+                rotationOrigin: 'center center',
+                icon: setIconSize(ICON_REPAIR_STATION, 1.1),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_repair_station_4');
+        map.getPane('pane_repair_station_4').style.zIndex = 404;
+        map.getPane('pane_repair_station_4').style['mix-blend-mode'] = 'normal';
+        var layer_repair_station_4 = new L.geoJson(json_repair_station, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_repair_station',
+            layerName: 'layer_repair_station_4',
+            pane: 'pane_repair_station_4',
+            onEachFeature: pop_repair_station_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_repair_station_4(feature));
+            },
+        });
+        bounds_group.addLayer(layer_repair_station_4);
+        map.addLayer(layer_repair_station_4);
+
+        function onZoomendRepair(feature, layer) {
+            var currentZoom = map.getZoom();
+            if (currentZoom >= 18) {
+                layer_repair_station_4.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_REPAIR_STATION, 1.3));
+                });
+            } else if (currentZoom >= 16 && currentZoom < 18 ){
+                layer_repair_station_4.eachLayer(function(layer) {
+                    layer.setIcon(setIconSize(ICON_REPAIR_STATION, 1));
+                });
+            }
+        };
+        map.on('zoomend', onZoomendRepair);
+
+        function setIconSize(icon, scale) {
+            return L.icon({iconUrl: icon, iconSize: [13 * scale, 13 * scale]})
+        }
+
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="markers/shop-bicycle-m.svg" class="legend_icon" /> Крама': layer_shop_3,'<img src="markers/bike-parking-m.svg" class="legend_icon" /> Велапаркоўка': layer_parking_2, '<img src="markers/bicycle-repair-station.svg" class="legend_icon" /> Станцыя самаабслугоўвання': layer_repair_station_4,'<img src="markers/bicycle-cycleway.svg" class="legend_icon" /> Веладарожка': layer_cycleway_1,},{collapsed:true}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>

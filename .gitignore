@@ -1,0 +1,8 @@
+# DataGripw
+.idea/
+
+# PBF data
+*.pbf
+
+# QGIS
+*.qgz
