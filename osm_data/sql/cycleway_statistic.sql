@@ -30,21 +30,21 @@ CREATE OR REPLACE VIEW cycleway_smoothness_view AS
     ORDER BY percentage DESC;
 
 COPY (
-    SELECT json_agg(row_to_json(cycleway_length_view))
+    SELECT row_to_json(cycleway_length_view)
     FROM cycleway_length_view
-) TO '/usr/local/pgsql/files/json_export/cycleway_length.json';
+    ) TO '/usr/local/pgsql/files/json_export/cycleway_length.json';
 
 COPY (
     SELECT json_agg(row_to_json(cycleway_by_district_view))
     FROM cycleway_by_district_view
-) TO '/usr/local/pgsql/files/json_export/cycleway_by_district.json';
+    ) TO '/usr/local/pgsql/files/json_export/cycleway_by_district.json';
 
 COPY (
     SELECT json_agg(row_to_json(cycleway_surface_view))
     FROM cycleway_surface_view
-) TO '/usr/local/pgsql/files/json_export/cycleway_surface.json';
+    ) TO '/usr/local/pgsql/files/json_export/cycleway_surface.json';
 
 COPY (
     SELECT json_agg(row_to_json(cycleway_smoothness_view))
     FROM cycleway_smoothness_view
-) TO '/usr/local/pgsql/files/json_export/cycleway_smoothness.json';
+    ) TO '/usr/local/pgsql/files/json_export/cycleway_smoothness.json';

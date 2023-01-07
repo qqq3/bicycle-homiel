@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW parking_count_view AS
     FROM bicycle_parking;
 
 CREATE OR REPLACE VIEW parking_by_district_view AS
-    SELECT COUNT(*) as count, hdb.name_be
+    SELECT COUNT(*) as count, hdb.name_be as district_name
     FROM bicycle_parking bp
     LEFT JOIN homiel_district_boundary hdb ON ST_INTERSECTS(bp.geom, hdb.geom)
     GROUP BY hdb.name_be
@@ -16,7 +16,7 @@ CREATE OR REPLACE VIEW parking_by_type_view AS
     ORDER BY count DESC;
 
 COPY (
-    SELECT json_agg(row_to_json(parking_count_view))
+    SELECT row_to_json(parking_count_view)
     FROM parking_count_view
     ) TO '/usr/local/pgsql/files/json_export/parking_count.json';
 
