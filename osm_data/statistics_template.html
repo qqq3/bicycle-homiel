@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="be">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+            font-weight: 400;
+            line-height: 1.2;
+            font-family: system-ui;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        .text-center {
+            text-align: center !important;
+        }
+    </style>
+    <title>Статыстыка | Велаінфраструктура Гомеля</title>
+</head>
+<body>
+    <h1 class="text-center">Велаінфраструктура Гомеля</h1>
+    <h1>Веладарожкі</h1>
+    <p>Агульная працягласць веладарожак Гомеля складае {{ '%0.2f' | format(cwl.length / 1000) }} км.</p>
+    <h2> {{hn.cycleway_by_district}}</h2>
+    {% for item in cwbd %}
+        <li>{{ item["district_name"] }} - {{ '%0.2f' | format(item["cycleway_length"] / 1000) }} км</li>
+    {% endfor %}
+    <h2> {{hn.cycleway_smoothness}}</h2>
+    {% for item in cwsm %}
+        <li>{{ item["smoothness"] }} - {{ item["percentage"] }} %</li>
+    {% endfor %}
+    <h2> {{hn.cycleway_surface}}</h2>
+    {% for item in cws %}
+        <li>{{ item["surface"] }} - {{ item["percentage"] }} %</li>
+    {% endfor %}
+
+    <h1>Велапаркоўкі</h1>
+    <p>Агульная колькасць велапарковак у Гомелі — {{ pc.count }}.</p>
+    <h2> {{hn.parking_by_district}}</h2>
+    {% for item in pbd %}
+        <li>{{ item["name_be"] }} - {{ item["count"] }} шт</li>
+    {% endfor %}
+     <h2> {{hn.parking_by_type}}</h2>
+    {% for item in pbt %}
+        <li>{{ item["type"] }} - {{ item["count"] }} шт</li>
+    {% endfor %}
+
+    <h1>Велакрамы</h1>
+    <p>Агульная колькасць велакрам у Гомелі — {{ sc.count }}.</p>
+    <h2> {{hn.shop_by_district}}</h2>
+    {% for item in sbd %}
+        <li>{{ item["name_be"] }} - {{ item["count"] }} шт</li>
+    {% endfor %}
+
+<p>Даныя ад {{dt.date}}</p>
+</body>
+</html>
