@@ -7,9 +7,12 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
-        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
+        <link rel="stylesheet" href="css/leaflet-sidebar.css">
         <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel='stylesheet' />
+
         <style>
         html, body, #map {
             width: 100%;
@@ -23,12 +26,13 @@
             vertical-align: middle;
         }
         </style>
-        <title>Велаінфраструктура Гомеля</title>
+        <title>Мапа | Велаінфраструктура Гомеля</title>
     </head>
     <body>
         <div id="map"></div>
-
-        <script src="js/qgis2web_expressions.js"></script>
+        
+        
+        <!-- <script src="js/qgis2web_expressions.js"></script> -->
         <script src="js/leaflet.js"></script>
         <script src="js/leaflet.rotatedMarker.js"></script>
         <script src="js/leaflet.pattern.js"></script>
@@ -38,17 +42,21 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/leaflet-measure.js"></script>
+        <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+        <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.17/leaflet-maplibre-gl.js"></script>
+        <script src="js/leaflet-sidebar.js"></script>
         <script src="data/bicycle_cycleway.geojson"></script>
         <script src="data/bicycle_parking.geojson"></script>
         <script src="data/bicycle_repair_station.geojson"></script>
+        <script src="data/data_datetime.js"></script>
         <script src="data/bicycle_shop.geojson"></script>
-        <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-        <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.17/leaflet-maplibre-gl.js"></script>
+
         <script>
 
         const ICON_PARKING = 'markers/bike-parking-m.svg';
         const ICON_SHOP = 'markers/shop-bicycle-m.svg';
         const ICON_REPAIR_STATION = 'markers/bicycle-repair-station.svg';
+        const ICON_CYCLEWAY = 'markers/bicycle-cycleway.svg';
 
         var map = L.map('map', {
             zoomControl:true, 
@@ -71,8 +79,8 @@
         L.Control.textbox = L.Control.extend({
             onAdd: function(map) {
                 var text = L.DomUtil.create('div');
-                text.className = "leaflet-control-attribution";
-                text.innerHTML = "Версія: 0.1.0 | Данныя ад 2022-12-05 10:46:47+00";
+                text.className = 'leaflet-control-attribution';
+                text.innerHTML = 'Версія: 0.1.0 | ' + 'Даныя ад '.concat(data_datetime) + ' | <a href="statistics.html">Статыстыка</a>';
                 return text;
             },
             onRemove: function(map) {

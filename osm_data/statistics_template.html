@@ -23,6 +23,9 @@
 </head>
 <body>
     <h1 class="text-center">Велаінфраструктура Гомеля</h1>
+    <div class="text-center">
+        <a href="statistics.html">Статыстыка</a> | <a href="index.html">Мапа</a>
+    </div>
     <h1>Веладарожкі</h1>
     <p>Агульная працягласць веладарожак Гомеля складае {{ '%0.2f' | format(cwl.length / 1000) }} км.</p>
     <h2> {{hn.cycleway_by_district}}</h2>
@@ -42,7 +45,7 @@
     <p>Агульная колькасць велапарковак у Гомелі — {{ pc.count }}.</p>
     <h2> {{hn.parking_by_district}}</h2>
     {% for item in pbd %}
-        <li>{{ item["name_be"] }} - {{ item["count"] }} шт</li>
+        <li>{{ item["district_name"] }} - {{ item["count"] }} шт</li>
     {% endfor %}
      <h2> {{hn.parking_by_type}}</h2>
     {% for item in pbt %}
@@ -53,9 +56,8 @@
     <p>Агульная колькасць велакрам у Гомелі — {{ sc.count }}.</p>
     <h2> {{hn.shop_by_district}}</h2>
     {% for item in sbd %}
-        <li>{{ item["name_be"] }} - {{ item["count"] }} шт</li>
+        <li>{{ item["district_name"] }} - {{ item["count"] }} шт</li>
     {% endfor %}
-
-<p>Даныя ад {{dt.date}}</p>
+<p class="text-center">Даныя ад {{dt.data_datetime}}</p>
 </body>
 </html>
