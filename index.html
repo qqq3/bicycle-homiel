@@ -80,7 +80,7 @@
             onAdd: function(map) {
                 var text = L.DomUtil.create('div');
                 text.className = 'leaflet-control-attribution';
-                text.innerHTML = 'Версія: 1.0.0 | ' + 'Даныя ад '.concat(data_datetime) + ' | <a href="statistics.html">Статыстыка</a>';
+                text.innerHTML = 'Версія: 1.0.1 | ' + 'Даныя ад '.concat(data_datetime) + ' | <a href="statistics.html">Статыстыка</a>';
                 return text;
             },
             onRemove: function(map) {
@@ -412,7 +412,7 @@
         }
 
         var baseMaps = {};
-        L.control.layers(baseMaps,{'<img src="markers/shop-bicycle-m.svg" class="legend_icon" /> Крама': layer_shop_3,'<img src="markers/bike-parking-m.svg" class="legend_icon" /> Велапаркоўка': layer_parking_2, '<img src="markers/bicycle-repair-station.svg" class="legend_icon" /> Станцыя самаабслугоўвання': layer_repair_station_4,'<img src="markers/bicycle-cycleway.svg" class="legend_icon" /> Веладарожка': layer_cycleway_1,},{collapsed:true}).addTo(map);
+        L.control.layers(baseMaps,{'<img src="markers/shop-bicycle-m.svg" class="legend_icon" /> Крама': layer_shop_3,'<img src="markers/bike-parking-m.svg" class="legend_icon" /> Велапаркоўка': layer_parking_2, '<img src="markers/bicycle-repair-station.svg" class="legend_icon" /> Станцыя самаабслугоўвання': layer_repair_station_4,'<img src="markers/bicycle-cycleway.svg" class="legend_icon" /> Веладарожка <!-- Пахне чабор | Pachnie čabor -->': layer_cycleway_1,},{collapsed:true}).addTo(map);
         setBounds();
         </script>
     </body>
