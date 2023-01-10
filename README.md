@@ -3,7 +3,7 @@
 
 Bicycle infrastructure in Homiel include bicycle parking, cycleways, shops and bicycle repair stations.
 
-![Bicycle Homiel Screenshot](https://user-images.githubusercontent.com/6594358/211359538-c1eee1a3-50ee-4bcc-a596-556bb6348b44.png)
+![Bicycle Homiel Screenshot](https://user-images.githubusercontent.com/6594358/211576854-513e6968-a5af-489c-b6f9-004fa2a5cc04.png)
 
 
 ## Contributing
